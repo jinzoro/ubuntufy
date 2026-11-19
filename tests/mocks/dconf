@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cmd="${1:-}"
+shift || true
+case "$cmd" in
+  dump)
+    cat "${MOCK_DCONF_DUMP:-/dev/null}" 2>/dev/null || true
+    ;;
+  load)
+    cat >>"${MOCK_DCONF_LOADED:-/dev/null}" 2>/dev/null || true
+    ;;
+  update)
+    exit 0
+    ;;
+  read)
+    exit 1
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+exit 0

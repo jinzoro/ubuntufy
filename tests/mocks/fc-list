@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [ -n "${MOCK_FC_LIST:-}" ] && [ -f "${MOCK_FC_LIST}" ]; then
+  cat "${MOCK_FC_LIST}"
+else
+  printf 'Ubuntu:style=Regular\nUbuntu Mono:style=Regular\n'
+fi

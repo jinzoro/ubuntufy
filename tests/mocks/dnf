@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+log="${MOCK_DNF_LOG:-/dev/null}"
+printf '%s\n' "$*" >>"$log"
+exit 0

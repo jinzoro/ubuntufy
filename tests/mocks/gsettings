@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+file="${MOCK_GSETTINGS_FILE:?}"
+schemas="${MOCK_GSETTINGS_SCHEMAS:-}"
+keysdir="${MOCK_GSETTINGS_KEYS_DIR:-}"
+rangesdir="${MOCK_GSETTINGS_RANGES_DIR:-}"
+
+cmd="${1:-}"
+shift || true
+
+case "$cmd" in
+  list-schemas)
+    if [ -n "$schemas" ] && [ -f "$schemas" ]; then
+      cat "$schemas"
+    else
+      cut -f1 "$file" 2>/dev/null | sort -u
+    fi
+    ;;
+  list-keys)
+    schema="${1:-}"
+    if [ -n "$keysdir" ] && [ -f "${keysdir}/${schema}" ]; then
+      cat "${keysdir}/${schema}"
+    else
+      awk -F'\t' -v s="$schema" '$1==s {print $2}' "$file" 2>/dev/null | sort -u
+    fi
+    ;;
+  get)
+    schema="${1:-}"; key="${2:-}"
+    line="$(awk -F'\t' -v s="$schema" -v k="$key" '$1==s && $2==k {sub(/^[^\t]*\t[^\t]*\t/,""); print; exit}' "$file" 2>/dev/null || true)"
+    if [ -z "$line" ]; then
+      exit 1
+    fi
+    printf '%s\n' "$line"
+    ;;
+  set)
+    schema="${1:-}"; key="${2:-}"; value="${3:-}"
+    tmp="$(mktemp)"
+    if [ -f "$file" ]; then
+      grep -v -F "$(printf '%s\t%s\t' "$schema" "$key")" "$file" >"$tmp" 2>/dev/null || true
+    fi
+    printf '%s\t%s\t%s\n' "$schema" "$key" "$value" >>"$tmp"
+    mv "$tmp" "$file"
+    ;;
+  range)
+    schema="${1:-}"; key="${2:-}"
+    if [ -n "$rangesdir" ] && [ -f "${rangesdir}/${schema}/${key}" ]; then
+      cat "${rangesdir}/${schema}/${key}"
+      exit 0
+    fi
+    exit 1
+    ;;
+  reset)
+    schema="${1:-}"; key="${2:-}"
+    tmp="$(mktemp)"
+    if [ -f "$file" ]; then
+      grep -v -F "$(printf '%s\t%s\t' "$schema" "$key")" "$file" >"$tmp" 2>/dev/null || true
+    fi
+    mv "$tmp" "$file"
+    ;;
+  *)
+    exit 1
+    ;;
+esac

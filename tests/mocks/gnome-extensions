@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+state="${MOCK_GNOME_EXTENSIONS:?}"
+cmd="${1:-}"
+shift || true
+case "$cmd" in
+  enable)
+    uuid="${1:-}"
+    grep -qx -- "$uuid" "$state" 2>/dev/null || printf '%s\n' "$uuid" >>"$state"
+    ;;
+  disable)
+    uuid="${1:-}"
+    tmp="$(mktemp)"; grep -v -Fx -- "$uuid" "$state" >"$tmp" 2>/dev/null || true; mv "$tmp" "$state"
+    ;;
+  list)
+    if [ "${1:-}" = "--enabled" ] || [ "${1:-}" = "-e" ]; then
+      cat "$state" 2>/dev/null || true
+    else
+      cat "$state" 2>/dev/null || true
+    fi
+    ;;
+  info)
+    uuid="${1:-}"
+    if grep -qx -- "$uuid" "$state" 2>/dev/null; then
+      printf 'State: ENABLED\n'
+    else
+      printf 'State: DISABLED\n'
+    fi
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+exit 0

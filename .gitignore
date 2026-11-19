@@ -1,0 +1,18 @@
+# Local test and runtime artifacts
+*.log
+*.tmp
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Local installs or packaging output
+dist/
+build/
+*.tar.gz

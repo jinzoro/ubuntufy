@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [ "${1:-}" = "" ]; then
+  printf '%s\n' "${MOCK_PLYMOUTH_THEME:-bgrt}"
+  exit 0
+fi
+# -R theme
+exit 0

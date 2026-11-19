@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Ubuntuify Fedora - main executable.
+#
+# This launcher only resolves the project root and hands control to the
+# library. All behaviour lives in src/ so that it can be audited and tested.
+set -Eeuo pipefail
+
+UF_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
+export UF_ROOT
+
+# shellcheck source=../src/lib.sh
+source "$UF_ROOT/src/lib.sh"
+# shellcheck source=../src/main.sh
+source "$UF_ROOT/src/main.sh"
+
+uf_main "$@"
